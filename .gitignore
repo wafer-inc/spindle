@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+*.npy
+*.npz
+sae_model.pt
+encoder_weights.npz
+vectors.npy

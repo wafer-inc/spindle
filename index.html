@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feature Attribution Viewer</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    textarea, button { width: 100%; margin-top: 1rem; padding: 0.5rem; }
+    .token { display: inline-block; padding: 0.2em 0.4em; border-radius: 4px; margin: 0.1em; transition: background 0.2s; cursor: pointer; position: relative; }
+    .token:hover::after {
+      content: attr(data-score);
+      position: absolute;
+      top: -1.5em;
+      left: 0;
+      background: black;
+      color: white;
+      padding: 2px 6px;
+      font-size: 0.75em;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .feature-select { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+    .feature-select span { cursor: pointer; padding: 0.3em 0.5em; background: #eee; border-radius: 5px; }
+    .feature-select span.active { background: #333; color: white; }
+    .legend { margin-top: 1rem; font-size: 0.9em; }
+    .legend span { display: inline-block; width: 1em; height: 1em; margin-right: 0.3em; vertical-align: middle; border: 1px solid #aaa; }
+    #popup {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 1rem;
+      border-radius: 6px;
+      max-width: 300px;
+      max-height: 200px;
+      overflow-y: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      font-size: 0.9em;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Feature Attribution Highlighter</h1>
+  <textarea id="text-input" rows="4">Play Drake on Spotify on WeMo</textarea>
+  <button onclick="analyzeText()">Analyze</button>
+
+  <div id="feature-picker" class="feature-select"></div>
+  <div class="legend">
+    <strong>Legend:</strong><br>
+    <span style="background: rgba(255, 0, 0, 0.3);"></span> strong activation
+    <span style="background: rgba(0, 0, 255, 0.3); margin-left: 1em;"></span> negative activation
+    <span style="background: rgba(0, 0, 0, 0.05); margin-left: 1em;"></span> low/no activation
+    <br>(hover any word to see its score)
+  </div>
+
+  <div id="highlighted" style="margin-top: 2rem;"></div>
+  <div id="popup"></div>
+
+  <script>
+    let globalTokens = []
+    let globalAttributions = []
+
+    async function analyzeText() {
+      const text = document.getElementById("text-input").value
+      const res = await fetch("http://localhost:8000/explain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      })
+      const data = await res.json()
+      globalTokens = data.tokens
+      globalAttributions = data.feature_scores // feature_id -> [score1, score2, ...]
+
+      // Display top-k features
+      const featurePicker = document.getElementById("feature-picker")
+      featurePicker.innerHTML = ''
+      const topFeatures = Object.entries(data.feature_strengths)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+      topFeatures.forEach(([fid, score]) => {
+        const span = document.createElement("span")
+        span.innerText = `Feature ${fid}`
+        span.onclick = () => highlightFeature(parseInt(fid))
+        featurePicker.appendChild(span)
+      })
+    }
+
+    function highlightFeature(featureId) {
+      const container = document.getElementById("highlighted")
+      const scores = globalAttributions[featureId] || []
+      const max = Math.max(...scores.map(Math.abs)) || 1
+      container.innerHTML = globalTokens.map((token, i) => {
+        const s = scores[i] || 0
+        const red = Math.floor(255 * Math.max(s, 0) / max)
+        const blue = Math.floor(255 * Math.max(-s, 0) / max)
+        const bg = `rgba(${red},0,${blue},0.3)`
+        return `<span class='token' data-index='${i}' data-score='${s.toFixed(3)}' style='background:${bg}' onclick='showTokenBreakdown(${i})'>${token}</span>`
+      }).join(" ")
+
+      document.querySelectorAll(".feature-select span").forEach(el => {
+        el.classList.remove("active")
+        if (el.innerText.includes(`Feature ${featureId}`)) el.classList.add("active")
+      })
+    }
+
+    function showTokenBreakdown(index) {
+      const popup = document.getElementById("popup")
+      const rows = Object.entries(globalAttributions)
+        .map(([fid, arr]) => ({ fid, val: arr[index] }))
+        .filter(r => Math.abs(r.val) > 0.01)
+        .sort((a, b) => Math.abs(b.val) - Math.abs(a.val))
+        .slice(0, 10)
+
+      popup.innerHTML = `<strong>Top Features @ Token:</strong><br>` + rows.map(r => `Feature ${r.fid} → ${r.val.toFixed(3)}`).join("<br>")
+      popup.style.display = "block"
+    }
+  </script>
+</body>
+</html>
