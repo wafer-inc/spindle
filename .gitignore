@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 *.npy
 *.npz
+*.db
 sae_model.pt
 encoder_weights.npz
 vectors.npy
