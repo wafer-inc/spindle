@@ -7,11 +7,11 @@ setup(
     name="spindle",
     version="0.1.0",
     author="Your Name",
-    author_email="your.email@example.com",
+    author_email="sam@wafer.systems",
     description="A library for training and deploying Sparse Autoencoders",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/spindle",
+    url="https://github.com/wafer-inc/spindle",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
