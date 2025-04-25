@@ -95,11 +95,3 @@ server.run()
 ## Documentation
 
 For detailed documentation and examples, see the [examples](./examples) directory.
-
-## License
-
-MIT License
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
