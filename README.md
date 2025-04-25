@@ -14,14 +14,10 @@ Spindle is a Python library for training and deploying Sparse Autoencoders (SAEs
 
 ## Installation
 
-```bash
-pip install spindle
-```
-
-Or install from source:
+Install from source:
 
 ```bash
-git clone https://github.com/yourusername/spindle.git
+git clone https://github.com/wafer-inc/spindle
 cd spindle
 pip install -e .
 ```
