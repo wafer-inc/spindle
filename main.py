@@ -21,7 +21,7 @@ from spindle.utils.weights import save_encoder_weights
 # ---------------------------
 DB_PATH = "wafer.db"
 HIDDEN_DIM = 6000
-EPOCHS = 20
+EPOCHS = 30
 SPARSITY_WEIGHT = 5e-3
 BATCH_SIZE = 128
 LEARNING_RATE = 1e-3
@@ -31,13 +31,17 @@ EMBEDDINGS_OUTPUT_PATH = "vectors.npy"
 # ---------------------------
 # STEP 1: Load Text from SQLite
 # ---------------------------
+
+
 def load_texts_from_db(db_path):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute("SELECT source_text FROM sources WHERE source_text IS NOT NULL")
+    cursor.execute(
+        "SELECT source_text FROM sources WHERE source_text IS NOT NULL")
     texts = [row[0] for row in cursor.fetchall()]
     conn.close()
     return texts
+
 
 texts = load_texts_from_db(DB_PATH)
 print(f"✅ Loaded {len(texts)} texts from wafer.db")
@@ -77,8 +81,10 @@ print(f"✅ SAE trained. Final loss: {train_stats['final_loss']}")
 loader = DataLoader(TensorDataset(embedding_tensor), batch_size=BATCH_SIZE)
 stats = compute_feature_statistics(model, loader)
 
-print(f"🔍 Dead features: {stats['dead_feature_count']} ({stats['dead_feature_ratio']:.2%})")
-print(f"🔍 Avg activation frequency: {stats['activation_frequency'].mean():.4f}")
+print(
+    f"🔍 Dead features: {stats['dead_feature_count']} ({stats['dead_feature_ratio']:.2%})")
+print(
+    f"🔍 Avg activation frequency: {stats['activation_frequency'].mean():.4f}")
 
 recon_stats = analyze_reconstruction_quality(model, loader)
 print(f"🔍 Avg reconstruction error (MSE): {recon_stats['avg_mse']:.6f}")
