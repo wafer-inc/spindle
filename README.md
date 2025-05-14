@@ -21,6 +21,7 @@ pip install spindle
 ```
 
 For additional features:
+
 ```bash
 # For transformer model support
 pip install "spindle[transformers]"
@@ -44,7 +45,7 @@ pip install -e .
 ```python
 import torch
 import numpy as np
-from spindle.models import SAE
+from spindle.models.autoencoder import SAE
 from spindle.models.trainer import train_sae
 
 # Load your data

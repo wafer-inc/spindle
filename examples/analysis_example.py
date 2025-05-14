@@ -5,7 +5,7 @@ Example script for analyzing SAE features.
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from spindle.models import SAE
+from spindle.models.autoencoder import SAE
 from spindle.data.embedding import EmbeddingManager
 from spindle.utils.analysis import (
     compute_feature_statistics,
@@ -40,7 +40,8 @@ print(f"RMSE: {recon_stats['rmse']:.6f}")
 # Compute feature statistics
 print("\nComputing feature statistics...")
 feature_stats = compute_feature_statistics(model, data_loader)
-print(f"Dead features: {feature_stats['dead_feature_count']} ({feature_stats['dead_feature_ratio']:.2%})")
+print(
+    f"Dead features: {feature_stats['dead_feature_count']} ({feature_stats['dead_feature_ratio']:.2%})")
 
 # Get feature activations for all samples
 print("Computing feature activations...")

@@ -7,7 +7,7 @@ This document provides a detailed reference for the Spindle API.
 ### SAE
 
 ```python
-from spindle.models import SAE
+from spindle.models.autoencoder import SAE
 ```
 
 The core Sparse Autoencoder implementation.
@@ -95,7 +95,7 @@ train_sae(model, data, epochs=10, batch_size=128, lr=1e-3, sparsity_weight=1e-3,
 
 Train a Sparse Autoencoder model.
 
-- `model` (spindle.models.SAE): The model to train
+- `model` (spindle.models.autoencoder.SAE): The model to train
 - `data` (torch.Tensor): Input data tensor of shape (num_samples, input_dim)
 - `epochs` (int, optional): Number of training epochs. Defaults to 10.
 - `batch_size` (int, optional): Training batch size. Defaults to 128.
@@ -118,7 +118,7 @@ calculate_sparsity(model, data, batch_size=256, device=None)
 
 Calculate the sparsity metrics of a trained SAE model on a dataset.
 
-- `model` (spindle.models.SAE): The trained SAE model
+- `model` (spindle.models.autoencoder.SAE): The trained SAE model
 - `data` (torch.Tensor): Input data tensor of shape (num_samples, input_dim)
 - `batch_size` (int, optional): Batch size for processing. Defaults to 256.
 - `device` (str, optional): Device to use ('cuda', 'cpu', etc). Defaults to None (auto-detect).

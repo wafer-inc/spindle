@@ -62,7 +62,7 @@ Once you have your embeddings, you can train an SAE:
 
 ```python
 import torch
-from spindle.models import SAE
+from spindle.models.autoencoder import SAE
 from spindle.models.trainer import train_sae
 
 # Load embeddings
