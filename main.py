@@ -6,8 +6,8 @@ from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
 
 from spindle.data.embedding import EmbeddingManager
-from spindle.models.autoencoder import SAE
-from spindle.models.trainer import train_sae
+from spindle.models.autoencoder import TopKSAE
+from spindle.models.trainer import (train_sae, init_orthogonal_weights)
 from spindle.utils.analysis import (
     compute_feature_statistics,
     analyze_reconstruction_quality,
@@ -22,11 +22,13 @@ from spindle.utils.weights import save_encoder_weights
 DB_PATH = "wafer.db"
 HIDDEN_DIM = 6000
 EPOCHS = 30
+WARMUP_EPOCHS = 5
 SPARSITY_WEIGHT = 5e-3
 BATCH_SIZE = 128
 LEARNING_RATE = 1e-3
 EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 EMBEDDINGS_OUTPUT_PATH = "vectors.npy"
+K = 800
 
 # ---------------------------
 # STEP 1: Load Text from SQLite
@@ -61,12 +63,15 @@ print(f"✅ Generated and saved embeddings: {EMBEDDINGS_OUTPUT_PATH}")
 # ---------------------------
 embedding_tensor = torch.tensor(embeddings, dtype=torch.float32)
 input_dim = embedding_tensor.shape[1]
-model = SAE(input_dim=input_dim, hidden_dim=HIDDEN_DIM)
+model = TopKSAE(input_dim=input_dim, hidden_dim=HIDDEN_DIM, k=K)
+
+model.apply(init_orthogonal_weights)
 
 train_stats = train_sae(
     model=model,
     data=embedding_tensor,
     epochs=EPOCHS,
+    warmup_epochs=WARMUP_EPOCHS,
     batch_size=BATCH_SIZE,
     lr=LEARNING_RATE,
     sparsity_weight=SPARSITY_WEIGHT,

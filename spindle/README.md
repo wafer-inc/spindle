@@ -2,7 +2,7 @@
 
 A library for training and deploying Sparse Autoencoders (SAEs) in PyTorch.
 
-**Current version:** 0.1.1
+**Current version:** 0.1.2
 
 ---
 

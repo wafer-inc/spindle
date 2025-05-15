@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="spindle-ml",
-    version="0.1.1",
+    version="0.1.2",
     author="Sam Hall",
     author_email="sam@wafer.systems",
     description="A library for training and deploying Sparse Autoencoders",
